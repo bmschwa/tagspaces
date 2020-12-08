@@ -107,9 +107,9 @@ This will start a development server in background, which watches for changes in
 Building of the packages can be accomplished with the integrated yarn scripts:
 
     $ yarn package-win
-
+    
     $ yarn package-linux
-
+    
     $ yarn package-osx
 
 For creating the packages for Windows, Linux and Mac OS respectively.
@@ -118,6 +118,10 @@ For creating the packages for Windows, Linux and Mac OS respectively.
 
 TagSpaces can be easily extended with the help of extensions. Currently we use the extensions for supporting the opening and editing of different file types in the application. More information about this topic can be found on the [extension page](https://www.tagspaces.org/extensions/) of our website.
 
+### Debugging in VSCode
+
+You can use Microsoft's free [VSCode](https://code.visualstudio.com/) to load, debug and develop the project.  You will need to have the [vscode-chrome-debug](https://github.com/Microsoft/vscode-chrome-debug) extension installed.
+
 ### How to start the WebDAV edition for testing?
 
 #### Development Server
@@ -125,6 +129,8 @@ TagSpaces can be easily extended with the help of extensions. Currently we use t
 For developing purposes and local tests, the WebDAV version of the app can be started with the following yarn command:
 
     $ yarn run-web
+
+    (_How does that compare to running  npm run-script run-web-dev?)
 
 This command will start a local node.js-WebDAV server on `http://127.0.0.1:8000`. Open your browser and enter the following URL:
 
@@ -145,16 +151,16 @@ Here is a sample config file for Apache on Linux:
     	ErrorLog ${APACHE_LOG_DIR}/error-somedomain.log
     	CustomLog ${APACHE_LOG_DIR}/access-somedomain.log combined
     </VirtualHost>
-
+    
     <Directory /var/www/somedomain.com/public_html>
     	Options FollowSymLinks MultiViews
     	AllowOverride None
     	Order allow,deny
     	allow from all
     </Directory>
-
+    
     Alias /files /var/yourFilesForWebDAV # this alias is useful if you do not want to store your files in the apache folder
-
+    
     <Location /files>
     	Options Indexes
     	DAV On

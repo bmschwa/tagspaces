@@ -100,6 +100,8 @@ export default class ObjectStoreIO {
         normalizedPath.length > 0
           ? normalizedPath + '/' + AppConfig.metaFolder + '/'
           : AppConfig.metaFolder + '/';
+      
+      // can we check to see if the directory is created first?
       const params = {
         Delimiter: '/',
         Prefix: metaDirPath,
@@ -268,6 +270,14 @@ export default class ObjectStoreIO {
             if (metaFileAvailable) {
               metaPromises.push(this.getEntryMeta(eentry));
             }
+
+            // I think you'll want to include a param to toggle if we want to look up
+            //  the remote tags.
+            //  This will also require the configured user has the permission
+            //   s3:GetObjectTagging
+            metaPromises.push( 
+              this.retrieveRemoteTags(file.Key));
+               
           }
         });
 
@@ -291,6 +301,32 @@ export default class ObjectStoreIO {
       });
     });
 
+
+  retrieveRemoteTags = async(key: String) : Promise<Object> => {
+    const promise = new Promise(async resolve => {
+      // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#getObjectTagging-property
+      let tags = [];
+      const params = {
+        Bucket: this.config.bucketName,
+        Key: key
+      };
+      this.objectStore.getObjectTagging(params, function(err, data){
+        if (err){
+          console.error("Failed retrieving tags for "+key+": err");
+          resolve(tags);
+          return;
+        }
+
+        data['TagSet'].array.forEach(element => {
+          tags.push(element);
+        });
+        resolve(tags);      
+      });
+    });
+    const result = await promise;
+    return result;
+  }
+  
   getEntryMeta = async (eentry: FileSystemEntry): Promise<Object> => {
     const promise = new Promise(async resolve => {
       if (eentry.isFile) {
@@ -618,7 +654,7 @@ export default class ObjectStoreIO {
                 .promise()
                 .then(data => {
                   resolve({
-                    uuid: uuidv1(), // data.ETag,
+                    uuid: uuidv1.v4(),
                     name: data.Key ? data.Key : extractFileName(filePath, '/'),
                     url: data.Location,
                     isFile: true,
